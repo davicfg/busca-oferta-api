@@ -11,14 +11,18 @@ Produtos
   - unidade_id
   - categoria_id
 
+<!-- unidade de venda do produto, kg, 1l, 500g, 500ml... -->
 Unidade
   - id
   - nome
 
+<!-- Marca dos produtos, mauricia, omu, -->
 Marca
   - id
   - nome
 
+
+<!-- Açouge, lavanderia, cereais... -->
 Categoria
   - id
   - nome
@@ -30,9 +34,15 @@ Precos
  - inicio_validade
  - fim_validade
 
+Supermercado
+  - id
+  - nome
+  
 Lojas
   - id
   - nome
+  - endereco
+  - horario_funcionamento
   
 Categorias
   - id
