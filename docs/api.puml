@@ -1,0 +1,113 @@
+@startuml Busca Oferta
+package "Presentation Layer" {
+    class ProductController <<Web>> {
+        +-RUD()
+    }
+    
+    class Unidade <<Web>> {
+        +CRUD()
+    }
+
+    class UserController
+        class AdminWebPortal <<Web>> {
+        +manageProducts()
+        +manageStores()
+        +viewPriceHistory()
+    }
+    class ClientMobileAPI <<API>> {
+        +getFavoritePrices()
+        +toggleFavorite()
+    }
+}
+
+
+/'package "Business/Service Layer" {'/
+/'    class InventoryService {'/
+/'        +getProductsByCategory()'/
+/'        +checkFavoriteStatus()'/
+/'    }'/
+/'    class PriceComparisonService {'/
+/'        +findBestPrice(productId)'/
+/'    }'/
+/'}'/
+
+/'package "Data/Persistence Layer (Models)" {'/
+    
+/'    entity Usuários {'/
+/'        * id : int'/
+/'        --'/
+/'        email : string'/
+/'        nome : string'/
+/'        telefone : string'/
+/'    }'/
+
+/'    entity Produtos {'/
+/'        * id : int'/
+/'        --'/
+/'        nome : string'/
+/'        marca_id : int'/
+/'        unidade_id : int'/
+/'        categoria_id : int'/
+/'    }'/
+
+/'    entity Precos {'/
+/'        * id : int'/
+/'        --'/
+/'        produto_id : int'/
+/'        loja_id : int'/
+/'        inicio_validade : date'/
+/'        fim_validade : date'/
+/'    }'/
+
+/'    entity Lojas {'/
+/'        * id : int'/
+/'        --'/
+/'        nome : string'/
+/'        endereco : string'/
+/'        horario_funcionamento : string'/
+/'    }'/
+
+/'    entity Produtos_favoritos {'/
+/'        * id : int'/
+/'        --'/
+/'        usuario_id : int'/
+/'        produto_id : int'/
+/'    }'/
+
+/'    entity Unidade {'/
+/'        * id : int'/
+/'        nome : string'/
+/'    }'/
+
+/'    entity Marca {'/
+/'        * id : int'/
+/'        nome : string'/
+/'    }'/
+
+/'    entity Categoria {'/
+/'        * id : int'/
+/'        nome : string'/
+/'    }'/
+
+/'    entity Supermercado {'/
+/'        * id : int'/
+/'        nome : string'/
+/'    }'/
+/'}'/
+
+' Relationships
+/'Produtos --> Marca : belongs to'/
+/'Produtos --> Unidade : has'/
+/'Produtos --> Categoria : categorized as'/
+/'Precos --> Produtos : prices for'/
+/'Precos --> Lojas : at location'/
+/'Lojas --> Supermercado : part of'/
+/'Produtos_favoritos --> Usuários : favorited by'/
+/'Produtos_favoritos --> Produtos : references'/
+
+' Layer Communications
+/'InventoryService ..> Produtos : manages'/
+/'PriceComparisonService ..> Precos : analyzes'/
+/'ProductController --> InventoryService : calls'/
+
+@enduml
