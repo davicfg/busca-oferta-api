@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import alexandre_davi_miguel.busca_oferta_api.dto.produto.ProdutoRequestDTO;
 import alexandre_davi_miguel.busca_oferta_api.dto.produto.ProdutoResponseDTO;
 import alexandre_davi_miguel.busca_oferta_api.model.Produto;
+import alexandre_davi_miguel.busca_oferta_api.model.enums.CategoriaProduto;
 import alexandre_davi_miguel.busca_oferta_api.repository.ProdutoRepository;
 
 import java.util.List;
@@ -27,12 +28,12 @@ public class ProdutoService {
         return new ProdutoResponseDTO(produtoSalvo);
     }
 
-    public List<ProdutoResponseDTO> listarTodos(String categoria) {
+    public List<ProdutoResponseDTO> listarTodos(CategoriaProduto categoria) {
         List<Produto> produtos;
         
         // UC05 - Filtragem de Produtos
-        if (categoria != null && !categoria.isBlank()) {
-            produtos = produtoRepository.findByCategoriaContainingIgnoreCase(categoria);
+        if (categoria != null) {
+            produtos = produtoRepository.findByCategoria(categoria);
         } else {
             produtos = produtoRepository.findAll();
         }
