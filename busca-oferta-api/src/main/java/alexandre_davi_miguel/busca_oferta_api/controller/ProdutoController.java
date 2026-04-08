@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import alexandre_davi_miguel.busca_oferta_api.dto.produto.ProdutoRequestDTO;
 import alexandre_davi_miguel.busca_oferta_api.dto.produto.ProdutoResponseDTO;
+import alexandre_davi_miguel.busca_oferta_api.model.enums.CategoriaProduto;
 import alexandre_davi_miguel.busca_oferta_api.service.ProdutoService;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class ProdutoController {
     // todos produtos, ou caso seja passado um argumento, utilizar esse
     // argumento na busca
     @GetMapping
-    public ResponseEntity<List<ProdutoResponseDTO>> listar(@RequestParam(required = false) String categoria) {
+    public ResponseEntity<List<ProdutoResponseDTO>> listar(@RequestParam(required = false) CategoriaProduto categoria) {
         return ResponseEntity.ok(produtoService.listarTodos(categoria));
     }
 
