@@ -3,29 +3,32 @@ package alexandre_davi_miguel.busca_oferta_api.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Entity
-@Table(name = "ofertas")
+@Table(name = "precos")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Oferta {
+public class Preco {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String urlDoProduto;
-
-    // Muitas ofertas podem pertencer a um mesmo produto
     @ManyToOne
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 
-    // Muitas ofertas podem pertencer a uma mesma loja
-    @ManyToOne
-    @JoinColumn(name = "loja_id", nullable = false)
-    private Loja loja;
+    @Column(nullable = false)
+    private BigDecimal valor;
+
+    @Column(nullable = false)
+    private LocalDate dataInicio;
+
+    @Column(nullable = false)
+    private LocalDate dataFim;
 }
