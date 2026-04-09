@@ -1,113 +1,104 @@
-@startuml Busca Oferta
-package "Presentation Layer" {
-    class ProductController <<Web>> {
-        +-RUD()
-    }
-    
-    class Unidade <<Web>> {
-        +CRUD()
-    }
+@startuml
+skinparam roundcorner 5
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+skinparam package {
+    BackgroundColor White
+    BorderColor Black
+}
 
-    class UserController
-        class AdminWebPortal <<Web>> {
-        +manageProducts()
-        +manageStores()
-        +viewPriceHistory()
+package "Controller" {
+    class ProdutoController {
+        - produtoService: ProdutoService
+        + criar(ProdutoRequestDTO): ResponseEntity<ProdutoResponseDTO>
+        + listar(CategoriaProduto*): List<ProdutoResponseDTO>
     }
-    class ClientMobileAPI <<API>> {
-        +getFavoritePrices()
-        +toggleFavorite()
+    class OfertaController {
+        - ofertaService: OfertaService
+        + criar(OfertaRequestDTO): ResponseEntity<OfertaResponseDTO>
+        + listarPorProduto(Long): ResponseEntity<List<OfertaResponseDTO>>
     }
 }
 
-
-/'package "Business/Service Layer" {'/
-/'    class InventoryService {'/
-/'        +getProductsByCategory()'/
-/'        +checkFavoriteStatus()'/
-/'    }'/
-/'    class PriceComparisonService {'/
-/'        +findBestPrice(productId)'/
-/'    }'/
-/'}'/
-
-/'package "Data/Persistence Layer (Models)" {'/
+package "DTO" {
+    package "Produto " as DTO_Produto {
+        class ProdutoResponseDTO
+        class ProdutoRequestDTO
+    }
     
-/'    entity Usuários {'/
-/'        * id : int'/
-/'        --'/
-/'        email : string'/
-/'        nome : string'/
-/'        telefone : string'/
-/'    }'/
+    package "Oferta " as DTO_Oferta {
+        class OfertaResponseDTO
+        class OfertaRequestDTO
+    }
+}
 
-/'    entity Produtos {'/
-/'        * id : int'/
-/'        --'/
-/'        nome : string'/
-/'        marca_id : int'/
-/'        unidade_id : int'/
-/'        categoria_id : int'/
-/'    }'/
+package "Service" {
+    class ProdutoService {
+        - produtoRepository: ProdutoRepository
+        + salvar(ProdutoRequestDTO): ProdutoResponseDTO
+        + listarTodos(CategoriaProduto): List<ProdutoResponseDTO>*
+    }
+    class OfertaService {
+        - ofertaRepository: OfertaRepository
+        - produtoRepository: ProdutoRepository
+        + salvar(OfertaRequestDTO): OfertaResponseDTO
+    }
+}
 
-/'    entity Precos {'/
-/'        * id : int'/
-/'        --'/
-/'        produto_id : int'/
-/'        loja_id : int'/
-/'        inicio_validade : date'/
-/'        fim_validade : date'/
-/'    }'/
+package "Model" {
+    package "Enums" {
+        enum CategoriaProduto <<Enumeration>> {
+            ALIMENTOS
+            BEBIDAS
+            LIMPEZA
+            OUTROS
+        }
+    }
+    
+    class Produto {
+        - id: Long
+        - CategoriaProduto: categoria
+    }
+    
+    class Oferta {
+        - urlDoProduto: String
+        - produto: Produto
+        - loja: Loja
+    }
+}
 
-/'    entity Lojas {'/
-/'        * id : int'/
-/'        --'/
-/'        nome : string'/
-/'        endereco : string'/
-/'        horario_funcionamento : string'/
-/'    }'/
+package "Repository" {
+    interface ProdutoRepository <<Interface>> {
+        findByCategoria(CategoriaProduto): List<Produto>
+    }
+    interface OfertaRepository <<Interface>> {
+        findByProdutoId(Long): List<Oferta>
+    }
+}
 
-/'    entity Produtos_favoritos {'/
-/'        * id : int'/
-/'        --'/
-/'        usuario_id : int'/
-/'        produto_id : int'/
-/'    }'/
+' Relationships (Dependencies)
+ProdutoController ..> DTO_Produto
+OfertaController ..> DTO_Oferta
 
-/'    entity Unidade {'/
-/'        * id : int'/
-/'        nome : string'/
-/'    }'/
+ProdutoService ..> DTO_Produto
+OfertaService ..> DTO_Oferta
 
-/'    entity Marca {'/
-/'        * id : int'/
-/'        nome : string'/
-/'    }'/
+ProdutoService ..> Produto
+ProdutoService ..> ProdutoRepository
 
-/'    entity Categoria {'/
-/'        * id : int'/
-/'        nome : string'/
-/'    }'/
+OfertaService ..> Oferta
+OfertaService ..> OfertaRepository
 
-/'    entity Supermercado {'/
-/'        * id : int'/
-/'        nome : string'/
-/'    }'/
-/'}'/
+ProdutoRepository ..> Produto
+OfertaRepository ..> Oferta
 
-' Relationships
-/'Produtos --> Marca : belongs to'/
-/'Produtos --> Unidade : has'/
-/'Produtos --> Categoria : categorized as'/
-/'Precos --> Produtos : prices for'/
-/'Precos --> Lojas : at location'/
-/'Lojas --> Supermercado : part of'/
-/'Produtos_favoritos --> Usuários : favorited by'/
-/'Produtos_favoritos --> Produtos : references'/
+Oferta ..> Produto
+Produto ..> CategoriaProduto
 
-' Layer Communications
-/'InventoryService ..> Produtos : manages'/
-/'PriceComparisonService ..> Precos : analyzes'/
-/'ProductController --> InventoryService : calls'/
+ProdutoRepository ..> CategoriaProduto
+ProdutoController ..> CategoriaProduto
 
 @enduml
