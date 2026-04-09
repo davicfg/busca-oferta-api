@@ -14,24 +14,28 @@ package "Controller" {
     class ProdutoController {
         - produtoService: ProdutoService
         + criar(ProdutoRequestDTO): ResponseEntity<ProdutoResponseDTO>
-        + listar(CategoriaProduto*): List<ProdutoResponseDTO>
+        + listar(CategoriaProduto?): ResponseEntity<List<ProdutoResponseDTO>>
+        + buscarPorId(Long): ResponseEntity<ProdutoResponseDTO>
     }
-    class OfertaController {
-        - ofertaService: OfertaService
-        + criar(OfertaRequestDTO): ResponseEntity<OfertaResponseDTO>
-        + listarPorProduto(Long): ResponseEntity<List<OfertaResponseDTO>>
+
+    class PrecoController {
+        - precoService: PrecoService
+        + criar(PrecoRequestDTO): ResponseEntity<PrecoResponseDTO>
+        + buscarPorId(Long): ResponseEntity<PrecoResponseDTO>
+        + listarPorProduto(Long): ResponseEntity<List<PrecoResponseDTO>>
+        + listarTodos(): ResponseEntity<List<PrecoResponseDTO>>
     }
 }
 
 package "DTO" {
-    package "Produto " as DTO_Produto {
+    package "Produto" as DTO_Produto {
         class ProdutoResponseDTO
         class ProdutoRequestDTO
     }
-    
-    package "Oferta " as DTO_Oferta {
-        class OfertaResponseDTO
-        class OfertaRequestDTO
+
+    package "Preco" as DTO_Preco {
+        class PrecoResponseDTO
+        class PrecoRequestDTO
     }
 }
 
@@ -39,12 +43,17 @@ package "Service" {
     class ProdutoService {
         - produtoRepository: ProdutoRepository
         + salvar(ProdutoRequestDTO): ProdutoResponseDTO
-        + listarTodos(CategoriaProduto): List<ProdutoResponseDTO>*
+        + buscarPorId(Long): ProdutoResponseDTO
+        + listarTodos(CategoriaProduto?): List<ProdutoResponseDTO>
     }
-    class OfertaService {
-        - ofertaRepository: OfertaRepository
+
+    class PrecoService {
+        - precoRepository: PrecoRepository
         - produtoRepository: ProdutoRepository
-        + salvar(OfertaRequestDTO): OfertaResponseDTO
+        + salvar(PrecoRequestDTO): PrecoResponseDTO
+        + buscarPorId(Long): PrecoResponseDTO
+        + listarPorProduto(Long): List<PrecoResponseDTO>
+        + listarTodos(): List<PrecoResponseDTO>
     }
 }
 
@@ -54,51 +63,59 @@ package "Model" {
             ALIMENTOS
             BEBIDAS
             LIMPEZA
+            HIGIENE_PESSOAL
+            ELETRODOMESTICOS
+            ELETRONICOS
             OUTROS
         }
     }
     
     class Produto {
         - id: Long
-        - CategoriaProduto: categoria
+        - nome: String
+        - categoria: CategoriaProduto
+        - precos: List<Preco>
     }
-    
-    class Oferta {
-        - urlDoProduto: String
+
+    class Preco {
+        - id: Long
         - produto: Produto
-        - loja: Loja
+        - valor: BigDecimal
+        - dataInicio: LocalDate
+        - dataFim: LocalDate
     }
 }
 
 package "Repository" {
     interface ProdutoRepository <<Interface>> {
         findByCategoria(CategoriaProduto): List<Produto>
+        findAll(): List<Produto>
+        findById(Long): Optional<Produto>
     }
-    interface OfertaRepository <<Interface>> {
-        findByProdutoId(Long): List<Oferta>
+
+    interface PrecoRepository <<Interface>> {
+        findByProdutoId(Long): List<Preco>
+        findAll(): List<Preco>
+        findById(Long): Optional<Preco>
     }
 }
 
 ' Relationships (Dependencies)
 ProdutoController ..> DTO_Produto
-OfertaController ..> DTO_Oferta
-
 ProdutoService ..> DTO_Produto
-OfertaService ..> DTO_Oferta
-
 ProdutoService ..> Produto
 ProdutoService ..> ProdutoRepository
-
-OfertaService ..> Oferta
-OfertaService ..> OfertaRepository
-
 ProdutoRepository ..> Produto
-OfertaRepository ..> Oferta
-
-Oferta ..> Produto
 Produto ..> CategoriaProduto
 
-ProdutoRepository ..> CategoriaProduto
-ProdutoController ..> CategoriaProduto
+PrecoController ..> DTO_Preco
+PrecoService ..> DTO_Preco
+PrecoService ..> Preco
+PrecoService ..> Produto
+PrecoService ..> PrecoRepository
+PrecoService ..> ProdutoRepository
+PrecoRepository ..> Preco
+Preco ..> Produto
+Produto ..> Preco
 
 @enduml
