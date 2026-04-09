@@ -4,6 +4,8 @@ import alexandre_davi_miguel.busca_oferta_api.model.enums.CategoriaProduto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "produtos")
 @Getter
@@ -23,5 +25,8 @@ public class Produto {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CategoriaProduto categoria;
+
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Preco> precos;
 
 }
