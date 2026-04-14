@@ -1,4 +1,4 @@
-@startuml
+@startuml Busca Oferta API
 skinparam roundcorner 5
 skinparam class {
     BackgroundColor White
@@ -25,6 +25,14 @@ package "Controller" {
         + listarPorProduto(Long): ResponseEntity<List<PrecoResponseDTO>>
         + listarTodos(): ResponseEntity<List<PrecoResponseDTO>>
     }
+
+    class EncarteController {
+      - encarteIAService: EncarteIAService
+      + criarEncarte(Encarte): ResponseEntity<Encarte>
+      + processarEncarte(Long): ResponseEntity<StatusAnaliseEncarte>
+      + buscarEncartePorId(Long): ResponseEntity<Encarte>
+      + listarEncartesPorUsuario(Long): ResponseEntity<List<Encarte>>
+    }
 }
 
 package "DTO" {
@@ -36,6 +44,10 @@ package "DTO" {
     package "Preco" as DTO_Preco {
         class PrecoResponseDTO
         class PrecoRequestDTO
+    }
+    package "Encarte" as DTO_Encarte {
+        class ProdutoExtraidoDTO
+        class EncarteExtracaoDTO
     }
 }
 
@@ -55,6 +67,20 @@ package "Service" {
         + listarPorProduto(Long): List<PrecoResponseDTO>
         + listarTodos(): List<PrecoResponseDTO>
     }
+
+
+    class EncarteIAService {
+      - chatClient: ChatClient
+      - precoRepository: PrecoRepository
+      - produtoRepository: ProdutoRepository
+      - encarteRepository: EncarteRepository
+
+      + salvarEncarte(Encarte): Encarte
+      + processarEncarte(Encarte): StatusAnaliseEncarte
+      + buscarEncartePorId(Long): Optional<Encarte>
+      + listarEncartesPorUsuario(Long): List<Encarte>
+      - salvarPrecosExtraidos(List<EncarteExtracaoDTO>): void
+    }
 }
 
 package "Model" {
@@ -68,22 +94,54 @@ package "Model" {
             ELETRONICOS
             OUTROS
         }
+
+        enum StatusAnaliseEncarte <<Enumeration>> {
+            PENDENTE
+            ANALISANDO
+            CONCLUIDA
+            ERRO
+        }
     }
     
+    class Usuario {
+      - id: Long
+      - email: String
+      - nome: String
+      - telefone: String
+      - produtosFavoritos: Set<Produto>
+    }
+
     class Produto {
         - id: Long
         - nome: String
+        - descricao: String
         - categoria: CategoriaProduto
-        - precos: List<Preco>
     }
 
     class Preco {
         - id: Long
         - produto: Produto
+        - supermercado: Supermercado
         - valor: BigDecimal
         - dataInicio: LocalDate
         - dataFim: LocalDate
     }
+
+    class Supermercado {
+        - id: Long
+        - nome: String
+        - endereco: String
+        - horarioFuncionamento: String
+    }
+
+    class Encarte{
+      - id: Long
+      - path: String
+      - usuario: Usuario
+      - mine_type: String
+      - size: Double
+    }
+
 }
 
 package "Repository" {
@@ -98,24 +156,53 @@ package "Repository" {
         findAll(): List<Preco>
         findById(Long): Optional<Preco>
     }
+
+    interface EncarteRepository <<Interface>> {
+        findByUsuarioId(Long): List<Encarte>
+        findById(Long): Optional<Encarte>
+        save(Encarte): Encarte
+    }
 }
 
 ' Relationships (Dependencies)
-ProdutoController ..> DTO_Produto
-ProdutoService ..> DTO_Produto
-ProdutoService ..> Produto
-ProdutoService ..> ProdutoRepository
-ProdutoRepository ..> Produto
-Produto ..> CategoriaProduto
 
-PrecoController ..> DTO_Preco
-PrecoService ..> DTO_Preco
-PrecoService ..> Preco
-PrecoService ..> Produto
+PrecoController --> PrecoService
+PrecoController ..> PrecoRequestDTO
+PrecoController ..> PrecoResponseDTO
+
+ProdutoController --> ProdutoService
+ProdutoController ..> ProdutoRequestDTO
+ProdutoController ..> ProdutoResponseDTO
+
+EncarteController --> EncarteIAService
+EncarteController ..> StatusAnaliseEncarte
+EncarteController ..> Encarte
+
+
 PrecoService ..> PrecoRepository
-PrecoService ..> ProdutoRepository
+PrecoService --> ProdutoRepository
+PrecoService ..> PrecoRequestDTO
+PrecoService ..> PrecoResponseDTO
+
+ProdutoService ..> ProdutoRepository
+ProdutoService ..> ProdutoRequestDTO
+ProdutoService ..> ProdutoResponseDTO
+
+EncarteIAService ..> EncarteRepository
+EncarteIAService ..> ChatClient
+EncarteIAService ..> PrecoRepository
+EncarteIAService ..> ProdutoRepository
+EncarteIAService ..> Encarte
+EncarteIAService ..> StatusAnaliseEncarte
+
 PrecoRepository ..> Preco
-Preco ..> Produto
-Produto ..> Preco
+ProdutoRepository ..> Produto
+
+
+
+Usuario o-- Produto : "favorita"
+Produto --> CategoriaProduto: "pertence a"
+Preco --> Produto: "refere-se a"
+Preco --> Supermercado: "disponível"
 
 @enduml
