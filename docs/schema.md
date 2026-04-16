@@ -1,54 +1,33 @@
-Usuários
-  - id
-  - e-mail
-  - nome
-  - telefone
+## Banco de Dados - Estrutura Simplificada
 
-Produtos
-  - is
-  - nome
-  - marca_id
-  - unidade_id
-  - categoria_id
+### Produtos
+- id (Primary Key)
+- nome (String, NOT NULL)
+- categoria (Enum: ALIMENTOS, BEBIDAS, LIMPEZA, HIGIENE_PESSOAL, ELETRODOMESTICOS, ELETRONICOS, OUTROS)
 
-<!-- unidade de venda do produto, kg, 1l, 500g, 500ml... -->
-Unidade
-  - id
-  - nome
+### Precos
+- id (Primary Key)
+- produto_id (Foreign Key → Produtos, NOT NULL)
+- valor (BigDecimal, NOT NULL) - Valor do produto
+- data_inicio (LocalDate, NOT NULL) - Data de início da validade do preço
+- data_fim (LocalDate, NOT NULL) - Data de fim da validade do preço
 
-<!-- Marca dos produtos, mauricia, omu, -->
-Marca
-  - id
-  - nome
+### Usuarios (Planejado para futuro)
+- id (Primary Key)
+- email (String, NOT NULL, UNIQUE)
+- nome (String, NOT NULL)
+- telefone (String)
 
+## Relacionamentos
 
-<!-- Açouge, lavanderia, cereais... -->
-Categoria
-  - id
-  - nome
+- **Produtos → Precos**: 1:N (Um produto pode ter múltiplos preços com datas de validade diferentes)
+- **Cascade Delete**: Quando um produto é deletado, todos os seus preços são deletados automaticamente
+- **Orphan Removal**: Preços órfãos são removidos automaticamente
 
-Precos
- - id
- - produto_id
- - loja_id
- - inicio_validade
- - fim_validade
+## Observações
 
-Supermercado
-  - id
-  - nome
-  
-Lojas
-  - id
-  - nome
-  - endereco
-  - horario_funcionamento
-  
-Categorias
-  - id
-  - nome
+- A arquitetura foi simplificada para focar no catálogo de produtos e histórico de preços
+- As entidades Loja e Oferta foram removidas (podem ser re-adicionadas conforme necessário)
+- Suporte a múltiplas marcas e unidades pode ser adicionado no futuro
+- A entidade Usuario é reservada para funcionalidades futuras como favoritos e monitoramento
 
-Produtos_favoritos
-  - id
-  - usuario_id
-  - produto_id
