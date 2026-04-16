@@ -1,113 +1,208 @@
-@startuml Busca Oferta
-package "Presentation Layer" {
-    class ProductController <<Web>> {
-        +-RUD()
-    }
-    
-    class Unidade <<Web>> {
-        +CRUD()
+@startuml Busca Oferta API
+skinparam roundcorner 5
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+skinparam package {
+    BackgroundColor White
+    BorderColor Black
+}
+
+package "Controller" {
+    class ProdutoController {
+        - produtoService: ProdutoService
+        + criar(ProdutoRequestDTO): ResponseEntity<ProdutoResponseDTO>
+        + listar(CategoriaProduto?): ResponseEntity<List<ProdutoResponseDTO>>
+        + buscarPorId(Long): ResponseEntity<ProdutoResponseDTO>
     }
 
-    class UserController
-        class AdminWebPortal <<Web>> {
-        +manageProducts()
-        +manageStores()
-        +viewPriceHistory()
+    class PrecoController {
+        - precoService: PrecoService
+        + criar(PrecoRequestDTO): ResponseEntity<PrecoResponseDTO>
+        + buscarPorId(Long): ResponseEntity<PrecoResponseDTO>
+        + listarPorProduto(Long): ResponseEntity<List<PrecoResponseDTO>>
+        + listarTodos(): ResponseEntity<List<PrecoResponseDTO>>
     }
-    class ClientMobileAPI <<API>> {
-        +getFavoritePrices()
-        +toggleFavorite()
+
+    class EncarteController {
+      - encarteIAService: EncarteIAService
+      + criarEncarte(Encarte): ResponseEntity<Encarte>
+      + processarEncarte(Long): ResponseEntity<StatusAnaliseEncarte>
+      + buscarEncartePorId(Long): ResponseEntity<Encarte>
+      + listarEncartesPorUsuario(Long): ResponseEntity<List<Encarte>>
     }
 }
 
+package "DTO" {
+    package "Produto" as DTO_Produto {
+        class ProdutoResponseDTO
+        class ProdutoRequestDTO
+    }
 
-/'package "Business/Service Layer" {'/
-/'    class InventoryService {'/
-/'        +getProductsByCategory()'/
-/'        +checkFavoriteStatus()'/
-/'    }'/
-/'    class PriceComparisonService {'/
-/'        +findBestPrice(productId)'/
-/'    }'/
-/'}'/
+    package "Preco" as DTO_Preco {
+        class PrecoResponseDTO
+        class PrecoRequestDTO
+    }
+    package "Encarte" as DTO_Encarte {
+        class ProdutoExtraidoDTO
+        class EncarteExtracaoDTO
+    }
+}
 
-/'package "Data/Persistence Layer (Models)" {'/
+package "Service" {
+    class ProdutoService {
+        - produtoRepository: ProdutoRepository
+        + salvar(ProdutoRequestDTO): ProdutoResponseDTO
+        + buscarPorId(Long): ProdutoResponseDTO
+        + listarTodos(CategoriaProduto?): List<ProdutoResponseDTO>
+    }
+
+    class PrecoService {
+        - precoRepository: PrecoRepository
+        - produtoRepository: ProdutoRepository
+        + salvar(PrecoRequestDTO): PrecoResponseDTO
+        + buscarPorId(Long): PrecoResponseDTO
+        + listarPorProduto(Long): List<PrecoResponseDTO>
+        + listarTodos(): List<PrecoResponseDTO>
+    }
+
+
+    class EncarteIAService {
+      - chatClient: ChatClient
+      - precoRepository: PrecoRepository
+      - produtoRepository: ProdutoRepository
+      - encarteRepository: EncarteRepository
+
+      + salvarEncarte(Encarte): Encarte
+      + processarEncarte(Encarte): StatusAnaliseEncarte
+      + buscarEncartePorId(Long): Optional<Encarte>
+      + listarEncartesPorUsuario(Long): List<Encarte>
+      - salvarPrecosExtraidos(List<EncarteExtracaoDTO>): void
+    }
+}
+
+package "Model" {
+    package "Enums" {
+        enum CategoriaProduto <<Enumeration>> {
+            ALIMENTOS
+            BEBIDAS
+            LIMPEZA
+            HIGIENE_PESSOAL
+            ELETRODOMESTICOS
+            ELETRONICOS
+            OUTROS
+        }
+
+        enum StatusAnaliseEncarte <<Enumeration>> {
+            PENDENTE
+            ANALISANDO
+            CONCLUIDA
+            ERRO
+        }
+    }
     
-/'    entity Usuários {'/
-/'        * id : int'/
-/'        --'/
-/'        email : string'/
-/'        nome : string'/
-/'        telefone : string'/
-/'    }'/
+    class Usuario {
+      - id: Long
+      - email: String
+      - nome: String
+      - telefone: String
+      - produtosFavoritos: Set<Produto>
+    }
 
-/'    entity Produtos {'/
-/'        * id : int'/
-/'        --'/
-/'        nome : string'/
-/'        marca_id : int'/
-/'        unidade_id : int'/
-/'        categoria_id : int'/
-/'    }'/
+    class Produto {
+        - id: Long
+        - nome: String
+        - descricao: String
+        - categoria: CategoriaProduto
+    }
 
-/'    entity Precos {'/
-/'        * id : int'/
-/'        --'/
-/'        produto_id : int'/
-/'        loja_id : int'/
-/'        inicio_validade : date'/
-/'        fim_validade : date'/
-/'    }'/
+    class Preco {
+        - id: Long
+        - produto: Produto
+        - supermercado: Supermercado
+        - valor: BigDecimal
+        - dataInicio: LocalDate
+        - dataFim: LocalDate
+    }
 
-/'    entity Lojas {'/
-/'        * id : int'/
-/'        --'/
-/'        nome : string'/
-/'        endereco : string'/
-/'        horario_funcionamento : string'/
-/'    }'/
+    class Supermercado {
+        - id: Long
+        - nome: String
+        - endereco: String
+        - horarioFuncionamento: String
+    }
 
-/'    entity Produtos_favoritos {'/
-/'        * id : int'/
-/'        --'/
-/'        usuario_id : int'/
-/'        produto_id : int'/
-/'    }'/
+    class Encarte{
+      - id: Long
+      - path: String
+      - usuario: Usuario
+      - mine_type: String
+      - size: Double
+    }
 
-/'    entity Unidade {'/
-/'        * id : int'/
-/'        nome : string'/
-/'    }'/
+}
 
-/'    entity Marca {'/
-/'        * id : int'/
-/'        nome : string'/
-/'    }'/
+package "Repository" {
+    interface ProdutoRepository <<Interface>> {
+        findByCategoria(CategoriaProduto): List<Produto>
+        findAll(): List<Produto>
+        findById(Long): Optional<Produto>
+    }
 
-/'    entity Categoria {'/
-/'        * id : int'/
-/'        nome : string'/
-/'    }'/
+    interface PrecoRepository <<Interface>> {
+        findByProdutoId(Long): List<Preco>
+        findAll(): List<Preco>
+        findById(Long): Optional<Preco>
+    }
 
-/'    entity Supermercado {'/
-/'        * id : int'/
-/'        nome : string'/
-/'    }'/
-/'}'/
+    interface EncarteRepository <<Interface>> {
+        findByUsuarioId(Long): List<Encarte>
+        findById(Long): Optional<Encarte>
+        save(Encarte): Encarte
+    }
+}
 
-' Relationships
-/'Produtos --> Marca : belongs to'/
-/'Produtos --> Unidade : has'/
-/'Produtos --> Categoria : categorized as'/
-/'Precos --> Produtos : prices for'/
-/'Precos --> Lojas : at location'/
-/'Lojas --> Supermercado : part of'/
-/'Produtos_favoritos --> Usuários : favorited by'/
-/'Produtos_favoritos --> Produtos : references'/
+' Relationships (Dependencies)
 
-' Layer Communications
-/'InventoryService ..> Produtos : manages'/
-/'PriceComparisonService ..> Precos : analyzes'/
-/'ProductController --> InventoryService : calls'/
+PrecoController --> PrecoService
+PrecoController ..> PrecoRequestDTO
+PrecoController ..> PrecoResponseDTO
+
+ProdutoController --> ProdutoService
+ProdutoController ..> ProdutoRequestDTO
+ProdutoController ..> ProdutoResponseDTO
+
+EncarteController --> EncarteIAService
+EncarteController ..> StatusAnaliseEncarte
+EncarteController ..> Encarte
+
+
+PrecoService ..> PrecoRepository
+PrecoService --> ProdutoRepository
+PrecoService ..> PrecoRequestDTO
+PrecoService ..> PrecoResponseDTO
+
+ProdutoService ..> ProdutoRepository
+ProdutoService ..> ProdutoRequestDTO
+ProdutoService ..> ProdutoResponseDTO
+
+EncarteIAService ..> EncarteRepository
+EncarteIAService ..> ChatClient
+EncarteIAService ..> PrecoRepository
+EncarteIAService ..> ProdutoRepository
+EncarteIAService ..> Encarte
+EncarteIAService ..> StatusAnaliseEncarte
+
+PrecoRepository ..> Preco
+ProdutoRepository ..> Produto
+
+
+
+Usuario o-- Produto : "favorita"
+Produto --> CategoriaProduto: "pertence a"
+Preco --> Produto: "refere-se a"
+Preco --> Supermercado: "disponível"
 
 @enduml
