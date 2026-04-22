@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import alexandre_davi_miguel.busca_oferta_api.dto.produto.ProdutoRequestDTO;
 import alexandre_davi_miguel.busca_oferta_api.dto.produto.ProdutoResponseDTO;
+import alexandre_davi_miguel.busca_oferta_api.exception.EntidadeNaoEncontradaException;
 import alexandre_davi_miguel.busca_oferta_api.model.Produto;
 import alexandre_davi_miguel.busca_oferta_api.model.enums.CategoriaProduto;
 import alexandre_davi_miguel.busca_oferta_api.repository.ProdutoRepository;
@@ -43,7 +44,7 @@ public class ProdutoService {
 
     public ProdutoResponseDTO buscarPorId(Long id) {
         Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado")); // ToDo: Criar exceção customizada
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Produto não encontrado com o ID: " + id));
         return new ProdutoResponseDTO(produto);
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import alexandre_davi_miguel.busca_oferta_api.dto.preco.PrecoRequestDTO;
 import alexandre_davi_miguel.busca_oferta_api.dto.preco.PrecoResponseDTO;
+import alexandre_davi_miguel.busca_oferta_api.exception.EntidadeNaoEncontradaException;
 import alexandre_davi_miguel.busca_oferta_api.model.Preco;
 import alexandre_davi_miguel.busca_oferta_api.model.Produto;
 import alexandre_davi_miguel.busca_oferta_api.repository.PrecoRepository;
@@ -22,7 +23,7 @@ public class PrecoService {
 
     public PrecoResponseDTO salvar(PrecoRequestDTO dto) {
         Produto produto = produtoRepository.findById(dto.produtoId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado")); // TODO: Criar exceção customizada
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Produto não encontrado com o ID: " + dto.produtoId()));
 
         Preco preco = Preco.builder()
                 .produto(produto)
@@ -37,7 +38,7 @@ public class PrecoService {
 
     public PrecoResponseDTO buscarPorId(Long id) {
         Preco preco = precoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Preço não encontrado")); // TODO: Criar exceção customizada
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Preço referente ao ID: " + id + " não encontrado")); 
         return new PrecoResponseDTO(preco);
     }
 
