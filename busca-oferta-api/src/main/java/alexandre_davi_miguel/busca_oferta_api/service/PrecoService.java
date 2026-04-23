@@ -1,8 +1,5 @@
 package alexandre_davi_miguel.busca_oferta_api.service;
 
-import alexandre_davi_miguel.busca_oferta_api.exception.ResourceNotFoundException;
-import alexandre_davi_miguel.busca_oferta_api.model.Supermercado;
-import alexandre_davi_miguel.busca_oferta_api.repository.SupermercadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,18 +19,13 @@ public class PrecoService {
 
     private final PrecoRepository precoRepository;
     private final ProdutoRepository produtoRepository;
-    private final SupermercadoRepository supermercadoRepository;
 
     public PrecoResponseDTO salvar(PrecoRequestDTO dto) {
         Produto produto = produtoRepository.findById(dto.produtoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com o ID: " + dto.produtoId()));
-
-        Supermercado supermercado = supermercadoRepository.findById(dto.supermercadoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Supermercado não encontrado com o ID: " + dto.supermercadoId()));
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado")); // TODO: Criar exceção customizada
 
         Preco preco = Preco.builder()
                 .produto(produto)
-                .supermercado(supermercado)
                 .valor(dto.valor())
                 .dataInicio(dto.dataInicio())
                 .dataFim(dto.dataFim())
@@ -45,7 +37,7 @@ public class PrecoService {
 
     public PrecoResponseDTO buscarPorId(Long id) {
         Preco preco = precoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Preço não encontrado com o ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Preço não encontrado")); // TODO: Criar exceção customizada
         return new PrecoResponseDTO(preco);
     }
 
