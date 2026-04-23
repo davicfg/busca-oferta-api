@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import alexandre_davi_miguel.busca_oferta_api.dto.preco.PrecoRequestDTO;
 import alexandre_davi_miguel.busca_oferta_api.dto.preco.PrecoResponseDTO;
 import alexandre_davi_miguel.busca_oferta_api.service.PrecoService;
-import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class PrecoController {
     private final PrecoService precoService;
 
     @PostMapping
-    public ResponseEntity<PrecoResponseDTO> criar(@RequestBody @Valid PrecoRequestDTO dto) {
+    public ResponseEntity<PrecoResponseDTO> criar(@RequestBody PrecoRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(precoService.salvar(dto));
     }
 
