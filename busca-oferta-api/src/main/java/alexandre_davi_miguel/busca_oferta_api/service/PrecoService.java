@@ -1,6 +1,5 @@
 package alexandre_davi_miguel.busca_oferta_api.service;
 
-import alexandre_davi_miguel.busca_oferta_api.exception.ResourceNotFoundException;
 import alexandre_davi_miguel.busca_oferta_api.model.Supermercado;
 import alexandre_davi_miguel.busca_oferta_api.repository.SupermercadoRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import alexandre_davi_miguel.busca_oferta_api.dto.preco.PrecoRequestDTO;
 import alexandre_davi_miguel.busca_oferta_api.dto.preco.PrecoResponseDTO;
+import alexandre_davi_miguel.busca_oferta_api.exception.EntidadeNaoEncontradaException;
 import alexandre_davi_miguel.busca_oferta_api.model.Preco;
 import alexandre_davi_miguel.busca_oferta_api.model.Produto;
 import alexandre_davi_miguel.busca_oferta_api.repository.PrecoRepository;
@@ -26,10 +26,10 @@ public class PrecoService {
 
     public PrecoResponseDTO salvar(PrecoRequestDTO dto) {
         Produto produto = produtoRepository.findById(dto.produtoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com o ID: " + dto.produtoId()));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Produto não encontrado com o ID: " + dto.produtoId()));
 
         Supermercado supermercado = supermercadoRepository.findById(dto.supermercadoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Supermercado não encontrado com o ID: " + dto.supermercadoId()));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Supermercado não encontrado com o ID: " + dto.supermercadoId()));
 
         Preco preco = Preco.builder()
                 .produto(produto)
@@ -45,7 +45,7 @@ public class PrecoService {
 
     public PrecoResponseDTO buscarPorId(Long id) {
         Preco preco = precoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Preço não encontrado com o ID: " + id));
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Preço referente ao ID: " + id + " não encontrado")); 
         return new PrecoResponseDTO(preco);
     }
 
