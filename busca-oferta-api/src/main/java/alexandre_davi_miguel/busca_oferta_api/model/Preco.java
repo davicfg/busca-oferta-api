@@ -23,6 +23,10 @@ public class Preco {
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 
+    @ManyToOne
+    @JoinColumn(name = "supermercado_id", nullable = false)
+    private Supermercado supermercado;
+
     @Column(nullable = false)
     private BigDecimal valor;
 

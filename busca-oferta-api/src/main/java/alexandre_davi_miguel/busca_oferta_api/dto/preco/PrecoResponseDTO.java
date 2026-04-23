@@ -9,6 +9,7 @@ public record PrecoResponseDTO(
         Long id,
         Long produtoId,
         String nomeProduto,
+        String supermercadoNome,
         BigDecimal valor,
         LocalDate dataInicio,
         LocalDate dataFim
@@ -18,6 +19,7 @@ public record PrecoResponseDTO(
                 preco.getId(),
                 preco.getProduto().getId(),
                 preco.getProduto().getNome(),
+                preco.getSupermercado().getNome(),
                 preco.getValor(),
                 preco.getDataInicio(),
                 preco.getDataFim()

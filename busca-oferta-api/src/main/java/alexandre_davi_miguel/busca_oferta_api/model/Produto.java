@@ -21,6 +21,8 @@ public class Produto {
 
     @Column(nullable = false)
     private String nome;
+
+    private String descricao;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
