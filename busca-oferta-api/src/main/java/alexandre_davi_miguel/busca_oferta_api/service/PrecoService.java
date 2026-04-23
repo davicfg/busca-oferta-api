@@ -54,6 +54,14 @@ public class PrecoService {
         return precos.stream().map(PrecoResponseDTO::new).collect(Collectors.toList());
     }
 
+    public List<PrecoResponseDTO> listarHistorico(Long produtoId) {
+        if (!produtoRepository.existsById(produtoId)) {
+            throw new EntidadeNaoEncontradaException("Produto não encontrado com o ID: " + produtoId);
+        }
+        List<Preco> precos = precoRepository.findByProdutoIdOrderByDataInicioDesc(produtoId);
+        return precos.stream().map(PrecoResponseDTO::new).collect(Collectors.toList());
+    }
+
     public List<PrecoResponseDTO> listarTodos() {
         List<Preco> precos = precoRepository.findAll();
         return precos.stream().map(PrecoResponseDTO::new).collect(Collectors.toList());

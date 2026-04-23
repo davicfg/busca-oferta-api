@@ -18,6 +18,8 @@ import org.springframework.data.domain.Sort;
 public interface PrecoRepository extends JpaRepository<Preco, Long> {
     List<Preco> findByProdutoId(Long produtoId);
 
+    List<Preco> findByProdutoIdOrderByDataInicioDesc(Long produtoId);
+
     @Query("SELECT p FROM Preco p WHERE " +
            "(:nome IS NULL OR LOWER(p.produto.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) AND " +
            "(:categoria IS NULL OR p.produto.categoria = :categoria) AND " +
