@@ -38,4 +38,9 @@ public class PrecoController {
     public ResponseEntity<List<PrecoResponseDTO>> listarTodos() {
         return ResponseEntity.ok(precoService.listarTodos());
     }
+    
+    @GetMapping("/catalogo-ativo")
+    public ResponseEntity<List<PrecoResponseDTO>> consultarCatalogo() {
+        return ResponseEntity.ok(precoService.listarCatalogoAtivo());
+    }
 }
