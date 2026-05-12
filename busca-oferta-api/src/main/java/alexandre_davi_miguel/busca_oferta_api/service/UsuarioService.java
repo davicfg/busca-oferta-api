@@ -19,7 +19,7 @@ public class UsuarioService {
     public UsuarioResponseDTO salvar(UsuarioRequestDTO dto) {
 
         if (usuarioRepository.existsByEmail(dto.email())) {
-            throw new QuebraUnicidadeException("Já existe um usuário cadastrado com este e-mail."); // ToDo: Criar exceção customizada
+            throw new QuebraUnicidadeException("Já existe um usuário cadastrado com este e-mail."); 
         }
 
         Usuario usuario = Usuario.builder()
