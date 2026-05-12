@@ -17,6 +17,8 @@ import org.springframework.data.domain.Sort;
 @Repository
 public interface PrecoRepository extends JpaRepository<Preco, Long> {
     List<Preco> findByProdutoId(Long produtoId);
+    
+    List<Preco> findByDataFimGreaterThanEqual(LocalDate dataAtual);
 
     List<Preco> findByProdutoIdOrderByDataInicioDesc(Long produtoId);
 
