@@ -7,4 +7,5 @@ public record SupermercadoDTO(Long id, String nome) {
     public SupermercadoDTO(Supermercado supermercado) {
         this(supermercado.getId(), supermercado.getNome());
     }
+
 }
