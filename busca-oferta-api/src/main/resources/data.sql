@@ -20,6 +20,7 @@ INSERT INTO precos (produto_id, supermercado_id, valor, data_inicio, data_fim) V
 INSERT INTO precos (produto_id, supermercado_id, valor, data_inicio, data_fim) VALUES (1, 2, 22.50, '2026-04-22', '2026-04-28'); -- Arroz no Carrefour (Mais barato!)
 INSERT INTO precos (produto_id, supermercado_id, valor, data_inicio, data_fim) VALUES (2, 1, 8.50, '2026-04-20', '2026-04-30'); -- Feijão no BH
 INSERT INTO precos (produto_id, supermercado_id, valor, data_inicio, data_fim) VALUES (3, 3, 5.99, '2026-04-23', '2026-04-25'); -- Cerveja no Verdemar
+INSERT INTO precos (produto_id, supermercado_id, valor, data_inicio, data_fim) VALUES (1, 1, 24.90, '2026-05-10', '2026-05-25'); -- Teste
 
 -- Ofertas Expiradas
 INSERT INTO precos (produto_id, supermercado_id, valor, data_inicio, data_fim) VALUES (4, 2, 1.99, '2026-03-01', '2026-03-15'); -- Sabão expirado
