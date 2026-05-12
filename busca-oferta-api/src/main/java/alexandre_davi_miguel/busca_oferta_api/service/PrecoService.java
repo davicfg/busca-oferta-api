@@ -2,6 +2,7 @@ package alexandre_davi_miguel.busca_oferta_api.service;
 
 import alexandre_davi_miguel.busca_oferta_api.model.Supermercado;
 import alexandre_davi_miguel.busca_oferta_api.repository.SupermercadoRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import alexandre_davi_miguel.busca_oferta_api.model.Produto;
 import alexandre_davi_miguel.busca_oferta_api.repository.PrecoRepository;
 import alexandre_davi_miguel.busca_oferta_api.repository.ProdutoRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,5 +67,11 @@ public class PrecoService {
     public List<PrecoResponseDTO> listarTodos() {
         List<Preco> precos = precoRepository.findAll();
         return precos.stream().map(PrecoResponseDTO::new).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void removerPrecosExpirados() {
+    LocalDate hoje = LocalDate.now();
+    precoRepository.deleteByDataFimBefore(hoje);
     }
 }
