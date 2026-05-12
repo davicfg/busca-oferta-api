@@ -7,9 +7,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record PrecoRequestDTO(
-        Long produtoId,
-        BigDecimal valor,
-        LocalDate dataInicio,
         @NotNull
         Long produtoId,
         @NotNull
