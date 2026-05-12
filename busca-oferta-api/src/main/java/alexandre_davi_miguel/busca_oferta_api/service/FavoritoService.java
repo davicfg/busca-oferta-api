@@ -21,6 +21,28 @@ public class FavoritoService {
     private final FavoritoRepository favoritoRepository;
     private final UsuarioRepository usuarioRepository; 
     private final ProdutoRepository produtoRepository;
+    private final PrecoRepository precoRepository;
+
+    @Transactional
+    public void adicionarFavoritoPorWhatsapp(String whatsappJid, Long precoId) {
+        // Busca ou cria o usuário baseado no JID
+        Usuario usuario = usuarioRepository.findByWhatsappJid(whatsappJid)
+                .orElseGet(() -> {
+                    Usuario novoUsuario = Usuario.builder()
+                            .nome("Usuário WhatsApp")
+                            .email(whatsappJid + "@whatsapp.com")
+                            .whatsappJid(whatsappJid)
+                            .senha("whatsapp_default") // Senha dummy
+                            .build();
+                    return usuarioRepository.save(novoUsuario);
+                });
+
+        // Busca a oferta (Preço) para pegar o Produto
+        Preco preco = precoRepository.findById(precoId)
+                .orElseThrow(() -> new EntidadeNaoEncontradaException("Oferta (ID: " + precoId + ") não encontrada."));
+
+        adicionarFavorito(usuario.getId(), preco.getProduto().getId());
+    }
 
     @Transactional
     public void adicionarFavorito(Long usuarioId, Long produtoId) {
