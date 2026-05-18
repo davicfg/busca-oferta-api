@@ -24,6 +24,3 @@ INSERT INTO precos (produto_id, supermercado_id, valor, data_inicio, data_fim) V
 
 -- Ofertas Expiradas
 INSERT INTO precos (produto_id, supermercado_id, valor, data_inicio, data_fim) VALUES (4, 2, 1.99, '2026-03-01', '2026-03-15'); -- Sabão expirado
-
--- Ofertas Futuras
-INSERT INTO precos (produto_id, supermercado_id, valor, data_inicio, data_fim) VALUES (5, 1, 3.50, '2026-05-01', '2026-05-05'); -- Sabonete oferta futura
