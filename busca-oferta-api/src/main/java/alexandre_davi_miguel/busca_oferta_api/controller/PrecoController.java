@@ -38,4 +38,5 @@ public class PrecoController {
     public ResponseEntity<List<PrecoResponseDTO>> listarTodos() {
         return ResponseEntity.ok(precoService.listarTodos());
     }
+    
 }

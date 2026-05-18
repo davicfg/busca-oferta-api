@@ -65,6 +65,15 @@ public class FavoritoService {
 
         favoritoRepository.save(favorito);
     }
+    
+    @Transactional
+    public void removerFavorito(Long usuarioId, Long produtoId) {
+        if (!favoritoRepository.existsByUsuarioIdAndProdutoId(usuarioId, produtoId)) {
+            throw new EntidadeNaoEncontradaException("Este produto não está nos favoritos deste usuário.");
+        }
+
+        favoritoRepository.deleteByUsuarioIdAndProdutoId(usuarioId, produtoId);
+    }
 
     public List<ProdutoResponseDTO> listarFavoritos(Long usuarioId) {
         return favoritoRepository.findByUsuarioId(usuarioId).stream()

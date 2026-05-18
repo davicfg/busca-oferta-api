@@ -21,6 +21,12 @@ public class FavoritoController {
         favoritoService.adicionarFavorito(usuarioId, produtoId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+    
+    @DeleteMapping("/{produtoId}")
+    public ResponseEntity<Void> desfavoritar(@PathVariable Long usuarioId, @PathVariable Long produtoId) {
+        favoritoService.removerFavorito(usuarioId, produtoId);
+        return ResponseEntity.noContent().build(); 
+    }
 
     @GetMapping
     public ResponseEntity<List<ProdutoResponseDTO>> listar(@PathVariable Long usuarioId) {
