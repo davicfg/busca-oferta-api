@@ -1,5 +1,6 @@
 package alexandre_davi_miguel.busca_oferta_api.model;
 
+import alexandre_davi_miguel.busca_oferta_api.framework.EntidadeAlvoBase;
 import alexandre_davi_miguel.busca_oferta_api.model.enums.CategoriaProduto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,11 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Produto {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Produto extends EntidadeAlvoBase {
 
     @Column(nullable = false)
     private String nome;
