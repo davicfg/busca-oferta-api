@@ -1,5 +1,6 @@
 package alexandre_davi_miguel.busca_oferta_api.scheduler;
 
+import alexandre_davi_miguel.busca_oferta_api.framework.PoliticaLimpezaStrategy;
 import alexandre_davi_miguel.busca_oferta_api.service.PrecoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -7,15 +8,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class LimpezaOfertasTask {
+public class LimpezaOfertasTask implements PoliticaLimpezaStrategy {
 
-    private final PrecoService precoService;
+    private final PrecoService precoService; 
 
-    
-    @Scheduled(cron = "0 0 0 * * *") 
-    public void executarLimpezaDiaria() {
-        System.out.println("Iniciando tarefa agendada: Removendo ofertas expiradas...");
-        precoService.removerPrecosExpirados();
-        System.out.println("Tarefa concluída com sucesso.");
+    @Override
+    public void executarLimpeza() {
+        System.out.println("BuscaOfertas: Removendo ofertas expiradas...");
+        
+        precoService.removerPrecosExpirados(); 
     }
 }
