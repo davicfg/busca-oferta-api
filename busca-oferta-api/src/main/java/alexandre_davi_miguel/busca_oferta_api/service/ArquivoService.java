@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import alexandre_davi_miguel.busca_oferta_api.dto.encarte.ProdutoExtraidoDTO;
+import alexandre_davi_miguel.busca_oferta_api.framework.FonteDeDocumentos;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class ArquivoService {
+public class ArquivoService implements FonteDeDocumentos{
 
     private final Path pastaPendentes = Paths.get("uploads/pendentes");
     private final Path pastaProcessados = Paths.get("uploads/processados");
@@ -39,12 +40,14 @@ public class ArquivoService {
         Files.copy(arquivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
     }
 
+    @Override
     public List<Path> listarPdfsPendentes() throws IOException {
         try (Stream<Path> caminhos = Files.list(pastaPendentes)) {
             return caminhos.filter(Files::isRegularFile).collect(Collectors.toList());
         }
     }
 
+    @Override
     public void moverParaProcessados(Path arquivoOriginal) throws IOException {
         Path destino = pastaProcessados.resolve(arquivoOriginal.getFileName());
         Files.move(arquivoOriginal, destino, StandardCopyOption.REPLACE_EXISTING);
