@@ -5,6 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface FonteDeDocumentos {
- List<Path> listarPdfsPendentes() throws IOException;
+ List<Path> listarDocumentosPendentes() throws IOException;
  void moverParaProcessados(Path documento)  throws IOException ;
 }

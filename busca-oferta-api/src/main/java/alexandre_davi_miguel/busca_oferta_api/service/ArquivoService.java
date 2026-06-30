@@ -41,7 +41,7 @@ public class ArquivoService implements FonteDeDocumentos{
     }
 
     @Override
-    public List<Path> listarPdfsPendentes() throws IOException {
+    public List<Path> listarDocumentosPendentes() throws IOException {
         try (Stream<Path> caminhos = Files.list(pastaPendentes)) {
             return caminhos.filter(Files::isRegularFile).collect(Collectors.toList());
         }

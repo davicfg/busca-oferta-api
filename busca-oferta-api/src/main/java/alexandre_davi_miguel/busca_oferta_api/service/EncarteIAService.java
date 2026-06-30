@@ -27,7 +27,7 @@ public class EncarteIAService implements ConfiguracaoExtracaoIA{
 
     @Override
     public List<ProdutoExtraidoDTO> processarLotePendente() throws Exception {
-        List<Path> arquivosPendentes = arquivoService.listarPdfsPendentes();
+        List<Path> arquivosPendentes = arquivoService.listarDocumentosPendentes();
         List<ProdutoExtraidoDTO> todosOsProdutosExtraidos = new ArrayList<>();
 
         var converter = new BeanOutputConverter<>(EncarteExtracaoDTO.class);
