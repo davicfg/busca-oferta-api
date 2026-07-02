@@ -8,13 +8,14 @@ import org.springframework.http.MediaType;
 
 import alexandre_davi_miguel.busca_oferta_api.dto.encarte.EncarteExtracaoDTO;
 import alexandre_davi_miguel.busca_oferta_api.dto.encarte.ProdutoExtraidoDTO;
+import alexandre_davi_miguel.busca_oferta_api.framework.ConfiguracaoExtracaoIA;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class EncarteIAService {
+public class EncarteIAService implements ConfiguracaoExtracaoIA{
 
     private final ChatClient chatClient;
     private final ArquivoService arquivoService;
@@ -24,8 +25,9 @@ public class EncarteIAService {
         this.arquivoService = arquivoService;
     }
 
+    @Override
     public List<ProdutoExtraidoDTO> processarLotePendente() throws Exception {
-        List<Path> arquivosPendentes = arquivoService.listarPdfsPendentes();
+        List<Path> arquivosPendentes = arquivoService.listarDocumentosPendentes();
         List<ProdutoExtraidoDTO> todosOsProdutosExtraidos = new ArrayList<>();
 
         var converter = new BeanOutputConverter<>(EncarteExtracaoDTO.class);

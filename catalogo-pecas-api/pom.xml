@@ -9,11 +9,11 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>busca-oferta-api</artifactId>
+    <artifactId>catalogo-pecas-api</artifactId>
     <packaging>jar</packaging>
 
-    <name>Busca Oferta API</name>
-    <description>Instância 1 do framework focada em supermercados</description>
+    <name>Catalogo de pecas API</name>
+    <description>Instância 2 do framework focada em oficinas</description>
 
     <dependencies>
 

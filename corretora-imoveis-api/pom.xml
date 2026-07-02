@@ -9,11 +9,11 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>busca-oferta-api</artifactId>
+    <artifactId>corretora-imoveis-api</artifactId>
     <packaging>jar</packaging>
 
-    <name>Busca Oferta API</name>
-    <description>Instância 1 do framework focada em supermercados</description>
+    <name>Corretora de Imoveis API</name>
+    <description>Instância 3 do framework focada em corretoras</description>
 
     <dependencies>
 
