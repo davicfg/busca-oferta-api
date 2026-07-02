@@ -21,6 +21,7 @@
         <module>extrator-ia-framework</module>
         <module>busca-oferta-api</module>
         <module>catalogo-pecas-api</module>
+        <module>corretora-imoveis-api</module>
     </modules>
 
    <properties>
