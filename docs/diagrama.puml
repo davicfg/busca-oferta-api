@@ -1,0 +1,174 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 70
+
+title Arquitetura do Sistema: Framework e Múltiplas Instanciações
+
+package "Módulo: extrator-ia-framework (NÚCLEO / PONTOS FIXOS)" #E6F2FF {
+    
+    abstract class EntidadeAlvoBase <<@MappedSuperclass>> {
+        - Long id
+    }
+
+    interface FonteDeDocumentos <<Ponto Flexível>> {
+        + listarDocumentosPendentes() : List<Path>
+        + moverParaProcessados(Path documento)
+    }
+
+    interface ConfiguracaoExtracaoIA<T> <<Ponto Flexível>> {
+        + processarLotePendente() : List<T>
+    }
+
+    interface PoliticaLimpezaStrategy <<Ponto Flexível>> {
+        + executarLimpeza()
+    }
+
+    class MotorDeLimpezaScheduler <<Ponto Fixo>> {
+        - List<PoliticaLimpezaStrategy> politicasDeLimpeza
+        + executarLimpezaDiaria() <<@Scheduled>>
+    }
+    
+    note right of MotorDeLimpezaScheduler
+        *Inversão de Controle:*
+        O Framework CHAMA os pontos flexíveis.
+        O método executarLimpezaDiaria() itera sobre a lista
+        injetada e chama politica.executarLimpeza()
+        sem conhecer a regra de negócio por trás.
+    end note
+
+    MotorDeLimpezaScheduler o-down-> "0..*" PoliticaLimpezaStrategy : "Chama Ponto Flexível"
+}
+
+package "Módulo: busca-oferta-api (INSTÂNCIA 1 / IMPLEMENTAÇÕES)" #E6FFE6 {
+
+    package "busca.model" {
+        class Produto {
+            - String nome
+            - String descricao
+            - CategoriaProduto categoria
+        }
+        class Preco {
+            - BigDecimal valor
+            - LocalDate dataInicio
+            - LocalDate dataFim
+        }
+        class Supermercado
+        
+        Produto "1" -- "0..*" Preco
+        Preco "*" -- "1" Supermercado
+    }
+
+    package "busca.scheduler" {
+        class LimpezaOfertasTask {
+            - PrecoService precoService
+            + executarLimpeza()
+        }
+    }
+
+    package "busca.service" {
+        class ArquivoService {
+            + listarDocumentosPendentes() : List<Path>
+        }
+        class EncarteIAService {
+            + processarLotePendente() : List<ProdutoExtraidoDTO>
+        }
+    }
+    
+    LimpezaOfertasTask --> "busca.service" : "Usa"
+}
+
+package "Módulo: catalogo-pecas-api (INSTÂNCIA 2 / IMPLEMENTAÇÕES)" #FFF3E6 {
+
+    package "catalogo.model" {
+        class PecaAutomotiva {
+            - String codigoPeca
+            - String nome
+            - List<String> veiculosCompativeis
+            - BigDecimal precoCusto
+        }
+    }
+
+    package "catalogo.service" {
+        class PoliticaLimpezaSemestral {
+            + executarLimpeza()
+        }
+        class FonteCatalogoPecas {
+            + listarDocumentosPendentes() : List<Path>
+            + moverParaProcessados(Path)
+        }
+        class ConfiguracaoExtracaoCatalogo {
+            + processarLotePendente() : List<PecaExtraidaDTO>
+        }
+        class PecaAutomotivaService
+    }
+
+    package "catalogo.controller" {
+        class PecaAutomotivaController
+    }
+    
+    PecaAutomotivaController --> PecaAutomotivaService
+}
+
+package "Módulo: corretora-imoveis-api (INSTÂNCIA 3 / IMPLEMENTAÇÕES)" #E6E6FF {
+
+    package "corretora.model" {
+        class Imovel {
+            - String codigoImovel
+            - String tipo
+            - String endereco
+            - BigDecimal valor
+        }
+    }
+
+    package "corretora.service" {
+        class PoliticaLimpezaImoveis {
+            + executarLimpeza()
+        }
+        class FonteDocsImobiliarios {
+            + listarDocumentosPendentes() : List<Path>
+            + moverParaProcessados(Path)
+        }
+        class ConfiguracaoExtracaoImovel {
+            + processarLotePendente() : List<ImovelExtraidoDTO>
+        }
+        class ImovelService
+    }
+
+    package "corretora.controller" {
+        class ImovelController
+    }
+    
+    ImovelController --> ImovelService
+}
+
+' =========================================================
+' HERANÇA E IMPLEMENTAÇÃO (INSTÂNCIA 1 - VAREJO)
+' =========================================================
+
+Produto -up-|> EntidadeAlvoBase : "Herda"
+LimpezaOfertasTask .up.|> PoliticaLimpezaStrategy : "Implementa"
+ArquivoService .up.|> FonteDeDocumentos : "Implementa"
+EncarteIAService .up.|> ConfiguracaoExtracaoIA : "Implementa"
+
+' =========================================================
+' HERANÇA E IMPLEMENTAÇÃO (INSTÂNCIA 2 - AUTOPEÇAS)
+' =========================================================
+
+PecaAutomotiva -up-|> EntidadeAlvoBase : "Herda"
+PoliticaLimpezaSemestral .up.|> PoliticaLimpezaStrategy : "Implementa"
+FonteCatalogoPecas .up.|> FonteDeDocumentos : "Implementa"
+ConfiguracaoExtracaoCatalogo .up.|> ConfiguracaoExtracaoIA : "Implementa"
+
+' =========================================================
+' HERANÇA E IMPLEMENTAÇÃO (INSTÂNCIA 3 - CORRETORA)
+' =========================================================
+
+Imovel -up-|> EntidadeAlvoBase : "Herda"
+PoliticaLimpezaImoveis .up.|> PoliticaLimpezaStrategy : "Implementa"
+FonteDocsImobiliarios .up.|> FonteDeDocumentos : "Implementa"
+ConfiguracaoExtracaoImovel .up.|> ConfiguracaoExtracaoIA : "Implementa"
+
+@enduml
