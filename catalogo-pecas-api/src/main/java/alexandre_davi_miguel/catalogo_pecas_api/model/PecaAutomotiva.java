@@ -1,4 +1,4 @@
-package main.java.alexandre_davi_miguel.catalogo_pecas_api.model;  
+package alexandre_davi_miguel.catalogo_pecas_api.model;  
 
 import alexandre_davi_miguel.busca_oferta_api.framework.EntidadeAlvoBase;
 import jakarta.persistence.Entity;
@@ -14,7 +14,7 @@ public class PecaAutomotiva extends EntidadeAlvoBase {
     
     private String codigoPeca;
     private String nome;
-    private String veiculosCompativeis; // Pode ser mapeado como List<String> ou @ElementCollection futuramente
+    private List<String> veiculosCompativeis; // Pode ser mapeado como List<String> ou @ElementCollection futuramente
     private BigDecimal precoCusto;
     
 }

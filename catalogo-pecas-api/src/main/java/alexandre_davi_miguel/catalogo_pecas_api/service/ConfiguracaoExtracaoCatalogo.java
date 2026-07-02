@@ -1,7 +1,7 @@
-package main.java.alexandre_davi_miguel.catalogo_pecas_api.service; 
+package alexandre_davi_miguel.catalogo_pecas_api.service; 
 
 import alexandre_davi_miguel.busca_oferta_api.framework.ConfiguracaoExtracaoIA;
-import alexandre_davi_miguel.busca_oferta_api.instanciacao2.dto.PecaExtraidaDTO;
+import alexandre_davi_miguel.catalogo_pecas_api.dto.PecaExtraidaDTO;
 import org.springframework.stereotype.Service;
 import java.util.List;
 

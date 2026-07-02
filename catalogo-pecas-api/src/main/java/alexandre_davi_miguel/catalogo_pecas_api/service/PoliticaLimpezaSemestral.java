@@ -1,4 +1,4 @@
-package main.java.alexandre_davi_miguel.catalogo_pecas_api.service; 
+package alexandre_davi_miguel.catalogo_pecas_api.service; 
 
 import alexandre_davi_miguel.busca_oferta_api.framework.PoliticaLimpezaStrategy;
 import org.springframework.stereotype.Service;
