@@ -1,21 +1,37 @@
 package alexandre_davi_miguel.catalogo_pecas_api.service; 
 
-import alexandre_davi_miguel.busca_oferta_api.framework.ConfiguracaoExtracaoIA;
+import alexandre_davi_miguel.busca_oferta_api.framework.AbstractExtratorIA;
+import alexandre_davi_miguel.busca_oferta_api.framework.FonteDeDocumentos;
 import alexandre_davi_miguel.catalogo_pecas_api.dto.PecaExtraidaDTO;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ConfiguracaoExtracaoCatalogo implements ConfiguracaoExtracaoIA<PecaExtraidaDTO> {
+public class ConfiguracaoExtracaoCatalogo extends AbstractExtratorIA<PecaExtraidaDTO> {
+
+    private final PecaAutomotivaService pecaService;
+
+    public ConfiguracaoExtracaoCatalogo(FonteDeDocumentos fonte, PecaAutomotivaService pecaService) {
+        super(fonte);
+        this.pecaService = pecaService;
+    }
 
     @Override
-    public List<PecaExtraidaDTO> processarLotePendente() throws Exception {
-        String prompt = "Analise o seguinte catálogo técnico de fabricante ou tabela de preços. " +
-                        "Extraia os dados no formato JSON contendo os seguintes campos obrigatórios: " +
-                        "codigo da peça, nome, veículos compatíveis e preço de custo.";
-        
-        // Lógica de chamada ao ChatClient (Gemini/ChatGPT) utilizando o prompt acima
-        // e convertendo a string JSON de resposta em List<PecaExtraidaDTO>
-        return null; 
+    protected String getPromptEspecífico() {
+        return "Analise o seguinte catálogo técnico de fabricante. " +
+               "Extraia os dados no formato JSON contendo: " +
+               "codigoPeca, nome, veiculosCompativeis e precoCusto.";
+    }
+
+    @Override
+    protected Class<PecaExtraidaDTO> getTipoDTO() {
+        return PecaExtraidaDTO.class;
+    }
+
+    @Override
+    protected void salvarLote(List<PecaExtraidaDTO> itensExtraidos) {
+        for (PecaExtraidaDTO dto : itensExtraidos) {
+            pecaService.salvar(dto);
+        }
     }
 }
