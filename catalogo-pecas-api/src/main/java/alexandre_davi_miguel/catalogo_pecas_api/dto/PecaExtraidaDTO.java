@@ -1,0 +1,13 @@
+package alexandre_davi_miguel.catalogo_pecas_api.dto;  
+
+import lombok.Data;
+import java.math.BigDecimal;
+import java.util.List;
+
+@Data
+public class PecaExtraidaDTO {
+    private String codigoPeca;
+    private String nome;
+    private List<String> veiculosCompativeis;
+    private BigDecimal precoCusto;
+}
