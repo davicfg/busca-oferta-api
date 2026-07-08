@@ -1,67 +1,66 @@
 package alexandre_davi_miguel.busca_oferta_api.service;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.converter.BeanOutputConverter;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
-import org.springframework.http.MediaType;
-
 import alexandre_davi_miguel.busca_oferta_api.dto.encarte.EncarteExtracaoDTO;
 import alexandre_davi_miguel.busca_oferta_api.dto.encarte.ProdutoExtraidoDTO;
-import alexandre_davi_miguel.busca_oferta_api.framework.ConfiguracaoExtracaoIA;
+import alexandre_davi_miguel.busca_oferta_api.framework.PipelineExtracaoGenerico;
+import alexandre_davi_miguel.busca_oferta_api.framework.FonteDeDocumentos;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
-public class EncarteIAService implements ConfiguracaoExtracaoIA{
+public class EncarteIAService extends PipelineExtracaoGenerico<EncarteExtracaoDTO> {
 
-    private final ChatClient chatClient;
     private final ArquivoService arquivoService;
 
-    public EncarteIAService(ChatClient.Builder builder, ArquivoService arquivoService) {
-        this.chatClient = builder.build();
+    public EncarteIAService(ArquivoService arquivoService) {
         this.arquivoService = arquivoService;
     }
 
-    @Override
     public List<ProdutoExtraidoDTO> processarLotePendente() throws Exception {
-        List<Path> arquivosPendentes = arquivoService.listarDocumentosPendentes();
-        List<ProdutoExtraidoDTO> todosOsProdutosExtraidos = new ArrayList<>();
-
-        var converter = new BeanOutputConverter<>(EncarteExtracaoDTO.class);
-        String instrucao = """
-            Analise este encarte de supermercado. 
-            Extraia o nome dos produtos, marcas, unidades de medida e preços.
-            Retorne exclusivamente no formato JSON conforme o esquema fornecido.
-            """;
-
-        for (Path pdfPath : arquivosPendentes) {
-            // Extrai o ID do supermercado do nome do arquivo (ex: "1_169000_encarte.pdf" -> ID 1)
-            Long supermercadoId = Long.parseLong(pdfPath.getFileName().toString().split("_")[0]);
+        
+        Map<Path, EncarteExtracaoDTO> resultadosBrutos = super.executarPipelineExtracao();
+        List<ProdutoExtraidoDTO> listaRevisao = new ArrayList<>();
+        
+        for (Map.Entry<Path, EncarteExtracaoDTO> entry : resultadosBrutos.entrySet()) {
+            Path pdfPath = entry.getKey();
+            EncarteExtracaoDTO dtoIA = entry.getValue();
             
-            FileSystemResource resource = new FileSystemResource(pdfPath.toFile());
-
-            // Chamada para o Gemini ler o PDF atual
-            EncarteExtracaoDTO resultadoDestePdf = chatClient.prompt()
-                    .user(u -> u.text(instrucao).media(MediaType.APPLICATION_PDF, resource))
-                    .call()
-                    .entity(converter);
-
-            // Adiciona o supermercadoId em cada produto extraído e joga na lista geral
-            if (resultadoDestePdf != null && resultadoDestePdf.itens() != null) {
-                for (ProdutoExtraidoDTO item : resultadoDestePdf.itens()) {
-                    todosOsProdutosExtraidos.add(new ProdutoExtraidoDTO(
-                            item.nome(), item.marca(), item.medida(), item.precoUnitario(), supermercadoId
+            // Pega o rastro do arquivo
+            String nomeArquivo = pdfPath.getFileName().toString();
+            Long supermercadoId = Long.parseLong(nomeArquivo.split("_")[0]);
+            
+            if (dtoIA != null && dtoIA.itens() != null) {
+                for (ProdutoExtraidoDTO item : dtoIA.itens()) {
+                    // Repassa o nome do arquivo para o DTO final
+                    listaRevisao.add(new ProdutoExtraidoDTO(
+                            item.nome(), item.marca(), item.medida(), 
+                            item.precoUnitario(), supermercadoId, nomeArquivo
                     ));
                 }
             }
-
-            // Move o arquivo para a pasta de processados para não ser lido de novo
-            arquivoService.moverParaProcessados(pdfPath);
         }
+        return listaRevisao; 
+    }
 
-        return todosOsProdutosExtraidos;
+    // --- IMPLEMENTAÇÃO DOS CONTRATOS DO FRAMEWORK ---
+    
+    @Override
+    protected FonteDeDocumentos getFonteDeDocumentos() {
+        return this.arquivoService;
+    }
+
+    @Override
+    protected String getPromptInstrucao() {
+        return "Analise este encarte de supermercado. Extraia o nome dos produtos, " +
+               "marcas, unidades de medida e preços.";
+    }
+
+    @Override
+    protected Class<EncarteExtracaoDTO> getClasseRetornoDTO() {
+        return EncarteExtracaoDTO.class;
     }
 }
