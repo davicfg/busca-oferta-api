@@ -19,10 +19,12 @@ public interface PecaAutomotivaRepository extends JpaRepository<PecaAutomotiva, 
     boolean existsByCodigoPeca(String codigoPeca);
 
     // CORREÇÃO ERRO B: Adicionado método de filtragem customizada com JPQL para o catálogo
-    @Query("SELECT p FROM PecaAutomotiva p WHERE " +
+    // OBS: veiculosCompativeis é uma @ElementCollection, então não é possível aplicar LOWER()
+    // diretamente sobre ela; é necessário fazer um LEFT JOIN com a coleção (join na cláusula FROM).
+    @Query("SELECT DISTINCT p FROM PecaAutomotiva p LEFT JOIN p.veiculosCompativeis v WHERE " +
            "(:codigoPeca IS NULL OR p.codigoPeca = :codigoPeca) AND " +
            "(:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) AND " +
-           "(:veiculoCompativel IS NULL OR LOWER(p.veiculosCompativeis) LIKE LOWER(CONCAT('%', :veiculoCompativel, '%'))) AND " +
+           "(:veiculoCompativel IS NULL OR LOWER(v) LIKE LOWER(CONCAT('%', :veiculoCompativel, '%'))) AND " +
            "(:precoMin IS NULL OR p.precoCusto >= :precoMin) AND " +
            "(:precoMax IS NULL OR p.precoCusto <= :precoMax)")
     List<PecaAutomotiva> filtrarPecas(

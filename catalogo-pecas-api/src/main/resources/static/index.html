@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de Peças Automotivas</title>
+<style>
+    :root {
+        --azul: #1f4e5f;
+        --azul-claro: #2e7490;
+        --fundo: #f5f7f8;
+        --borda: #d7dee0;
+        --texto: #223;
+        --sucesso: #2f7a4d;
+        --erro: #b3312c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+        background: var(--fundo);
+        color: var(--texto);
+        margin: 0;
+        padding: 0 0 60px;
+    }
+
+    header {
+        background: var(--azul);
+        color: #fff;
+        padding: 24px 32px;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    header p {
+        margin: 6px 0 0;
+        opacity: 0.85;
+        font-size: 0.9rem;
+    }
+
+    main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+
+    section {
+        background: #fff;
+        border: 1px solid var(--borda);
+        border-radius: 8px;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+    }
+
+    section h2 {
+        margin-top: 0;
+        font-size: 1.1rem;
+        color: var(--azul);
+    }
+
+    .linha {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-end;
+    }
+
+    .campo {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.85rem;
+    }
+
+    .campo label {
+        color: #556;
+    }
+
+    input, select {
+        padding: 8px 10px;
+        border: 1px solid var(--borda);
+        border-radius: 6px;
+        font-size: 0.9rem;
+        min-width: 140px;
+    }
+
+    button {
+        background: var(--azul-claro);
+        color: #fff;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+
+    button:hover {
+        background: var(--azul);
+    }
+
+    button.secundario {
+        background: #6b7b80;
+    }
+
+    button.secundario:hover {
+        background: #56646a;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--borda);
+    }
+
+    th {
+        color: #556;
+        font-weight: 600;
+    }
+
+    #log {
+        margin-top: 12px;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        font-family: "Courier New", monospace;
+        background: #f0f3f4;
+        border-radius: 6px;
+        padding: 10px 12px;
+        display: none;
+    }
+
+    .status-ok { color: var(--sucesso); }
+    .status-erro { color: var(--erro); }
+
+    .vazio {
+        color: #778;
+        font-style: italic;
+        padding: 10px 0;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Catálogo de Peças Automotivas</h1>
+    <p>Extrator de dados com IA (simulada) — monitoramento de preços</p>
+</header>
+
+<main>
+
+    <section>
+        <h2>1. Extrair catálogo (IA)</h2>
+        <p>Lê os documentos pendentes em <code>documentos/catalogos_pendentes</code>, envia para a IA (simulada) e cadastra as peças novas.</p>
+        <button id="btnExtrair">Extrair catálogo agora</button>
+        <div id="log"></div>
+    </section>
+
+    <section>
+        <h2>2. Consultar catálogo</h2>
+        <div class="linha">
+            <div class="campo">
+                <label for="fCodigo">Código</label>
+                <input id="fCodigo" placeholder="ex: P1001">
+            </div>
+            <div class="campo">
+                <label for="fNome">Nome</label>
+                <input id="fNome" placeholder="ex: filtro">
+            </div>
+            <div class="campo">
+                <label for="fVeiculo">Veículo compatível</label>
+                <input id="fVeiculo" placeholder="ex: Fiat Uno">
+            </div>
+            <div class="campo">
+                <label for="fPrecoMin">Preço mín.</label>
+                <input id="fPrecoMin" type="number" step="0.01">
+            </div>
+            <div class="campo">
+                <label for="fPrecoMax">Preço máx.</label>
+                <input id="fPrecoMax" type="number" step="0.01">
+            </div>
+            <div class="campo">
+                <label for="fOrdem">Ordenar por preço</label>
+                <select id="fOrdem">
+                    <option value="">Sem ordenação</option>
+                    <option value="asc">Crescente</option>
+                    <option value="desc">Decrescente</option>
+                </select>
+            </div>
+            <button id="btnBuscar">Buscar</button>
+            <button id="btnLimpar" class="secundario">Limpar filtros</button>
+        </div>
+
+        <table id="tabela">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Veículos compatíveis</th>
+                    <th>Preço de custo</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabela"></tbody>
+        </table>
+        <div id="vazio" class="vazio" style="display:none;">Nenhuma peça encontrada.</div>
+    </section>
+
+    <section>
+        <h2>3. Cadastrar peça manualmente</h2>
+        <div class="linha">
+            <div class="campo">
+                <label for="nCodigo">Código</label>
+                <input id="nCodigo">
+            </div>
+            <div class="campo">
+                <label for="nNome">Nome</label>
+                <input id="nNome">
+            </div>
+            <div class="campo">
+                <label for="nVeiculos">Veículos (separados por vírgula)</label>
+                <input id="nVeiculos" placeholder="Fiat Uno, Fiat Palio">
+            </div>
+            <div class="campo">
+                <label for="nPreco">Preço de custo</label>
+                <input id="nPreco" type="number" step="0.01">
+            </div>
+            <button id="btnCadastrar">Cadastrar</button>
+        </div>
+        <div id="logCadastro"></div>
+    </section>
+
+</main>
+
+<script>
+const API = "";
+
+async function buscarCatalogo() {
+    const params = new URLSearchParams();
+    const codigo = document.getElementById('fCodigo').value.trim();
+    const nome = document.getElementById('fNome').value.trim();
+    const veiculo = document.getElementById('fVeiculo').value.trim();
+    const precoMin = document.getElementById('fPrecoMin').value;
+    const precoMax = document.getElementById('fPrecoMax').value;
+    const ordem = document.getElementById('fOrdem').value;
+
+    if (codigo) params.set('codigoPeca', codigo);
+    if (nome) params.set('nome', nome);
+    if (veiculo) params.set('veiculoCompativel', veiculo);
+    if (precoMin) params.set('precoMin', precoMin);
+    if (precoMax) params.set('precoMax', precoMax);
+    if (ordem) params.set('ordemPreco', ordem);
+
+    const resp = await fetch(`${API}/pecas/catalogo?${params.toString()}`);
+    const dados = await resp.json();
+    renderizarTabela(dados);
+}
+
+function renderizarTabela(pecas) {
+    const corpo = document.getElementById('corpoTabela');
+    const vazio = document.getElementById('vazio');
+    corpo.innerHTML = '';
+
+    if (!pecas || pecas.length === 0) {
+        vazio.style.display = 'block';
+        return;
+    }
+    vazio.style.display = 'none';
+
+    for (const p of pecas) {
+        const tr = document.createElement('tr');
+        const veiculos = (p.veiculosCompativeis || []).join(', ');
+        const preco = p.precoCusto != null
+            ? Number(p.precoCusto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            : '-';
+        tr.innerHTML = `
+            <td>${p.codigoPeca ?? ''}</td>
+            <td>${p.nome ?? ''}</td>
+            <td>${veiculos}</td>
+            <td>${preco}</td>
+        `;
+        corpo.appendChild(tr);
+    }
+}
+
+async function extrairCatalogo() {
+    const log = document.getElementById('log');
+    const btn = document.getElementById('btnExtrair');
+
+    log.style.display = 'block';
+    log.className = '';
+    log.textContent = 'Chamando a IA (simulada) e processando os documentos pendentes...';
+    btn.disabled = true;
+
+    try {
+        const resp = await fetch(`${API}/pecas/extrair`, { method: 'POST' });
+        const dados = await resp.json();
+
+        if (!resp.ok) {
+            log.className = 'status-erro';
+            log.textContent = 'Erro: ' + (dados.mensagem || 'falha ao extrair o catálogo.');
+        } else {
+            log.className = 'status-ok';
+            log.textContent = `Extração concluída: ${dados.length} peça(s) nova(s) cadastrada(s).`;
+            buscarCatalogo();
+        }
+    } catch (erro) {
+        log.className = 'status-erro';
+        log.textContent = 'Erro de conexão com a API: ' + erro.message;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function cadastrarPeca() {
+    const log = document.getElementById('logCadastro');
+    const codigo = document.getElementById('nCodigo').value.trim();
+    const nome = document.getElementById('nNome').value.trim();
+    const veiculosTexto = document.getElementById('nVeiculos').value.trim();
+    const preco = document.getElementById('nPreco').value;
+
+    const dto = {
+        codigoPeca: codigo,
+        nome: nome,
+        veiculosCompativeis: veiculosTexto ? veiculosTexto.split(',').map(v => v.trim()) : [],
+        precoCusto: preco ? Number(preco) : null
+    };
+
+    try {
+        const resp = await fetch(`${API}/pecas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dto)
+        });
+        const dados = await resp.json();
+
+        if (!resp.ok) {
+            log.className = 'status-erro';
+            log.textContent = 'Erro: ' + (dados.mensagem || 'não foi possível cadastrar.');
+        } else {
+            log.className = 'status-ok';
+            log.textContent = `Peça "${dados.nome}" cadastrada com sucesso.`;
+            document.getElementById('nCodigo').value = '';
+            document.getElementById('nNome').value = '';
+            document.getElementById('nVeiculos').value = '';
+            document.getElementById('nPreco').value = '';
+            buscarCatalogo();
+        }
+    } catch (erro) {
+        log.className = 'status-erro';
+        log.textContent = 'Erro de conexão com a API: ' + erro.message;
+    }
+}
+
+document.getElementById('btnExtrair').addEventListener('click', extrairCatalogo);
+document.getElementById('btnBuscar').addEventListener('click', buscarCatalogo);
+document.getElementById('btnCadastrar').addEventListener('click', cadastrarPeca);
+document.getElementById('btnLimpar').addEventListener('click', () => {
+    document.getElementById('fCodigo').value = '';
+    document.getElementById('fNome').value = '';
+    document.getElementById('fVeiculo').value = '';
+    document.getElementById('fPrecoMin').value = '';
+    document.getElementById('fPrecoMax').value = '';
+    document.getElementById('fOrdem').value = '';
+    buscarCatalogo();
+});
+
+// Carrega o catálogo assim que a página abre
+buscarCatalogo();
+</script>
+
+</body>
+</html>

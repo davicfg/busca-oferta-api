@@ -1,0 +1,9 @@
+# Catálogo de exemplo - Fornecedor AutoPeças Nordeste
+# Formato: codigoPeca;nome;veiculo1,veiculo2,...;precoCusto
+P1001;Filtro de Óleo;Fiat Uno,Fiat Palio,Fiat Mobi;25.90
+P1002;Pastilha de Freio Dianteira;Volkswagen Gol,Volkswagen Voyage;89.50
+P1003;Amortecedor Traseiro;Chevrolet Onix,Chevrolet Prisma;210.00
+P1004;Correia Dentada;Ford Ka,Ford Fiesta;76.30
+P1005;Bateria 60Ah;Hyundai HB20,Hyundai Creta;450.00
+P1006;Vela de Ignição;Toyota Corolla,Toyota Etios;18.75
+P1007;Radiador;Honda Civic,Honda City;320.40
