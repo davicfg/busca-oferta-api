@@ -4,6 +4,9 @@ import org.springframework.stereotype.Service;
 import alexandre_davi_miguel.busca_oferta_api.dto.encarte.EncarteExtracaoDTO;
 import alexandre_davi_miguel.busca_oferta_api.dto.encarte.ProdutoExtraidoDTO;
 import alexandre_davi_miguel.busca_oferta_api.framework.PipelineExtracaoGenerico;
+import alexandre_davi_miguel.busca_oferta_api.model.Produto;
+import alexandre_davi_miguel.busca_oferta_api.model.enums.CategoriaProduto;
+import alexandre_davi_miguel.busca_oferta_api.repository.ProdutoRepository;
 import alexandre_davi_miguel.busca_oferta_api.framework.FonteDeDocumentos;
 
 import java.nio.file.Path;
@@ -15,9 +18,11 @@ import java.util.Map;
 public class EncarteIAService extends PipelineExtracaoGenerico<EncarteExtracaoDTO> {
 
     private final ArquivoService arquivoService;
+    private final ProdutoRepository produtoRepository;
 
-    public EncarteIAService(ArquivoService arquivoService) {
+    public EncarteIAService(ArquivoService arquivoService, ProdutoRepository produtoRepository) {
         this.arquivoService = arquivoService;
+        this.produtoRepository = produtoRepository;
     }
 
     public List<ProdutoExtraidoDTO> processarLotePendente() throws Exception {
@@ -44,6 +49,19 @@ public class EncarteIAService extends PipelineExtracaoGenerico<EncarteExtracaoDT
             }
         }
         return listaRevisao; 
+    }
+    
+    public void salvarProdutosNoBanco(List<ProdutoExtraidoDTO> dtos) {
+        for (ProdutoExtraidoDTO dto : dtos) {
+            Produto novo = new Produto();
+            
+            novo.setNome(dto.nome());
+            novo.setCategoria(CategoriaProduto.ALIMENTOS);
+            
+            novo.setNomeArquivoOrigem(dto.nomeArquivoOrigem());
+            
+            produtoRepository.save(novo);
+        }
     }
 
     // --- IMPLEMENTAÇÃO DOS CONTRATOS DO FRAMEWORK ---

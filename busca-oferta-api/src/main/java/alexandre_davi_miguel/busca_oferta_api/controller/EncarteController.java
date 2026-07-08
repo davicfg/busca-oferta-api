@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/encartes")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class EncarteController {
 
     private final ArquivoService arquivoService;
@@ -43,6 +44,13 @@ public class EncarteController {
         }
     }
 
+    @PostMapping("/salvar")
+    public ResponseEntity<String> salvarNoBanco(@RequestBody List<ProdutoExtraidoDTO> produtosExtraidos) {
+        // Chama o serviço para salvar os dados
+        encarteIAService.salvarProdutosNoBanco(produtosExtraidos);
+        return ResponseEntity.ok("Salvo com sucesso!");
+    }
+    
     // Salvar na planilha
     @PostMapping("/salvar-planilha")
     public ResponseEntity<String> salvarNaPlanilha(@RequestBody List<ProdutoExtraidoDTO> produtosRevisados) {
